@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/fonts/custom-font.woff2') format('woff2');
+  font-display: swap;
+}
+body {
+  font-family: 'CustomFont', sans-serif;
+}
+
+
+@layer theme, base, components, utilities;
+
+/* Theme customization - using CSS variables in v4 */
+@layer theme {
+  :root {
+    /* Base spacing unit for consistent sizing */
+    --spacing: 0.25rem;
+    
+    /* Custom colors for button gradients */
+    --color-blue-300: oklch(0.85 0.15 260);
+    --color-blue-400: oklch(0.76 0.18 260);
+    --color-blue-500: oklch(0.67 0.20 260);
+    
+    --color-green-300: oklch(0.85 0.15 160);
+    --color-green-400: oklch(0.76 0.18 160);
+    --color-green-500: oklch(0.67 0.20 160);
+    
+    --color-purple-300: oklch(0.82 0.18 300);
+    --color-purple-400: oklch(0.74 0.20 300);
+    --color-purple-500: oklch(0.66 0.22 300);
+  }
+}
+
+/* Custom animations */
+@layer utilities {
+  /* Glow animation keyframes */
+  @keyframes glow-pulse {
+    0% {
+      filter: hue-rotate(0deg) brightness(1);
+    }
+    50% {
+      filter: hue-rotate(30deg) brightness(1.2);
+    }
+    100% {
+      filter: hue-rotate(0deg) brightness(1);
+    }
+  }
+
+  /* Apply the glow animation */
+  .animate-glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+  
+  /* Letter spacing animation for text inside buttons */
+  .letter-spacing-wider {
+    letter-spacing: 1px;
+  }
+  
+  /* Outer button container styling */
+  .outer-button {
+    position: relative;
+    min-height: 40px;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .outer-button:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* Optional component styles */
+@layer components {
+  /* You can define reusable component classes here */
+}
