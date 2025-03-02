@@ -3,21 +3,6 @@ import { motion } from "framer-motion";
 import { Link } from "react-scroll";
 
 export default function Navbar() {
-  // Smooth scroll function for navigation
-  const scrollToSection = (e, sectionId) => {
-    e.preventDefault();
-    const section = document.getElementById(sectionId);
-    if (section) {
-      // Smooth scroll to the section
-      section.scrollIntoView({ behavior: "smooth" });
-      
-      // Close mobile menu if it is open
-      if (typeof setIsOpen === "function") {
-        setIsOpen(false);
-      }
-    }
-  };
-
   const [scrolled, setScrolled] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [clickedLink, setClickedLink] = useState(null);
