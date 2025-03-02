@@ -291,7 +291,7 @@ export default function Version3Section() {
             className="mt-8 flex justify-center"
           >
             <motion.a
-              href="#contact"
+              href="#about"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               className="px-8 py-3 bg-green-500/20 border border-green-500 rounded-full text-green-400 font-bold flex items-center gap-2 transition-all group"

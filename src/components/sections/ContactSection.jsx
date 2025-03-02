@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 
 export default function ContactSection() {
   return (
-    <section id="contact" className="min-h-screen bg-black flex items-center justify-center p-8 relative">
+    <section id="about" className="min-h-screen bg-black flex items-center justify-center p-8 relative">
       {/* Background animation */}
       <motion.div 
         className="absolute inset-0 opacity-10"

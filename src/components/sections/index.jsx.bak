@@ -4,4 +4,4 @@
 export { default as HeroSection } from './HeroSection';
 export { default as MetaCurtisSection } from './MetaCurtisSection';
 export { default as Version3Section } from './Version3Section';
-export { default as AboutSection } from './AboutSection';
+export { default as ContactSection } from './ContactSection';

@@ -5,7 +5,7 @@ import {
   HeroSection,
   MetaCurtisSection,
   Version3Section,
-  ContactSection
+  AboutSection
 } from './components/sections'
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
       <HeroSection />
       <MetaCurtisSection />
       <Version3Section />
-      <ContactSection />
+      <AboutSection />
     </div>
   )
 }

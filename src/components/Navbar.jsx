@@ -27,7 +27,7 @@ export default function Navbar() {
     { name: "Home", to: "hero", color: "#ffffff", shadow: "rgba(255, 255, 255, 0.7)", borderColor: "#888888" },
     { name: "Meta Curtis", to: "meta-curtis", color: "#60a5fa", shadow: "rgba(96, 165, 250, 0.7)", borderColor: "#1e40af" },
     { name: "Version 3", to: "version-3", color: "#34d399", shadow: "rgba(52, 211, 153, 0.7)", borderColor: "#065f46" },
-    { name: "Contact", to: "contact", color: "#a78bfa", shadow: "rgba(167, 139, 250, 0.7)", borderColor: "#5b21b6" },
+    { name: "About", to: "contact", color: "#a78bfa", shadow: "rgba(167, 139, 250, 0.7)", borderColor: "#5b21b6" },
   ];
 
   return (
