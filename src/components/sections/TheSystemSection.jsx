@@ -1,10 +1,8 @@
-import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Zap, ArrowRight, CheckCircle, RefreshCw, Layers } from 'lucide-react';
 
-export default function Version3Section() {
-  // Memoize data to prevent unnecessary recalculations
-  const stepsData = useMemo(() => [
+export default function TheSystemSection() {
+  const stepsData = [
     {
       icon: <Brain size={24} />,
       title: "Meta Learning Framework",
@@ -23,104 +21,91 @@ export default function Version3Section() {
       description: "Creating self-optimizing cycles where both human and AI capabilities expand exponentially with each iteration.",
       color: "#3B82F6" // blue
     }
-  ], []);
+  ];
 
-  const benefitsData = useMemo(() => [
+  const benefitsData = [
     "3x faster skill acquisition and implementation",
     "AI becomes a true cognitive extension, not just a tool",
     "Self-improving feedback loops for continuous growth",
     "Meta-awareness that transcends conventional learning limitations"
-  ], []);
-
-  // Animation variants - defined outside render for better performance
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (delay = 0) => ({
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        duration: 0.6, 
-        delay, 
-        ease: "easeOut" 
-      }
-    })
-  };
-
-  const staggerChildren = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+  ];
 
   return (
-    <section 
-      id="version-3" 
-      className="min-h-screen bg-[var(--bg-deep-blue)] flex flex-col items-center p-4 md:p-8 relative overflow-hidden gpu-accelerated"
-    >
-      {/* Subtle Background Motion - simplified for better performance */}
-      <div
-        className="absolute inset-0 opacity-10 pointer-events-none"
+    <section id="version-3" className="min-h-screen bg-black flex flex-col items-center p-8 relative overflow-hidden">
+      {/* Subtle Background Motion */}
+      <motion.div
+        className="absolute inset-0 opacity-10"
+        animate={{
+          backgroundPosition: ['0% 0%', '100% 100%'],
+        }}
+        transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse' }}
         style={{
-          backgroundImage: 'linear-gradient(45deg, rgb(16 185 129 / 0.2) 0%, transparent 70%)',
+          backgroundImage: 'linear-gradient(45deg, rgba(16, 185, 129, 0.2) 0%, transparent 70%)',
           backgroundSize: '200% 200%',
-          backgroundPosition: '0% 0%'
         }}
       />
 
-      <div className="max-w-4xl w-full z-10">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={staggerChildren}
-          className="mb-12"
-        >
-          <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 flex flex-wrap items-baseline gap-3">
-            <motion.span variants={fadeInUp} custom={0.2} className="text-white">
-              The
-            </motion.span>
-            <motion.span variants={fadeInUp} custom={0.4} className="text-green-500">
-              System
-            </motion.span>
-          </h2>
-          
-          <motion.p
-            variants={fadeInUp}
-            custom={0.5}
-            className="text-xl text-white/80 mb-8 max-w-2xl"
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true, amount: 0.3 }}
+        className="max-w-4xl w-full z-10"
+      >
+        <h2 className="text-6xl md:text-7xl font-bold text-white mb-4 flex flex-wrap items-baseline gap-3">
+          <motion.span
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="text-white"
           >
-            A next-generation approach to human-AI integration where transformation isn't luck—it's engineered.
-          </motion.p>
-        </motion.div>
+            The
+          </motion.span>
+          <motion.span
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="text-green-500"
+          >
+            System
+          </motion.span>
+        </h2>
+        
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          viewport={{ once: true }}
+          className="text-xl text-white/80 mb-12 max-w-2xl"
+        >
+          A next-generation approach to human-AI integration where transformation isn't luck—it's engineered.
+        </motion.p>
 
         {/* The System Core Framework */}
         <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={0.6}
-          className="bg-black/50 p-6 md:p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
+          viewport={{ once: true }}
+          className="bg-black/50 p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-16"
         >
-          <h3 className="text-2xl font-bold text-green-400 mb-6">The MetaCurtis AI Integration Model</h3>
+          <h3 className="text-2xl font-bold text-green-400 mb-8">The MetaCurtis AI Integration Model</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stepsData.map((step, index) => (
               <motion.div 
                 key={index}
-                variants={fadeInUp}
-                custom={0.7 + (index * 0.1)}
-                whileHover={{ scale: 1.03 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 + (index * 0.2) }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05 }}
                 className="p-6 bg-black/60 rounded-lg border border-green-500/30 transition-all duration-300 flex flex-col"
-                style={{ 
-                  boxShadow: `0 0 10px ${step.color}20`
-                }}
               >
-                <div className="p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4" style={{ backgroundColor: `${step.color}30` }}>
+                <div className="p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4" 
+                     style={{ backgroundColor: `${step.color}30` }}>
                   <div style={{ color: step.color }}>{step.icon}</div>
                 </div>
                 <h4 className="text-xl font-bold text-white mb-2">{step.title}</h4>
@@ -144,21 +129,20 @@ export default function Version3Section() {
         
         {/* Evolution Layer */}
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={0.7}
-          className="bg-black/50 p-6 md:p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.7 }}
+          viewport={{ once: true }}
+          className="bg-black/50 p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-16"
         >
           <h3 className="text-2xl font-bold text-green-400 mb-6">AI-Human Integration Layers</h3>
           
-          <motion.div 
-            variants={staggerChildren}
-            className="flex flex-col space-y-4"
-          >
+          <div className="flex flex-col space-y-4">
             <motion.div
-              variants={fadeInUp}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              viewport={{ once: true }}
               className="flex items-center gap-4"
             >
               <div className="p-2 bg-gray-800/80 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
@@ -171,7 +155,10 @@ export default function Version3Section() {
             </motion.div>
             
             <motion.div
-              variants={fadeInUp}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
+              viewport={{ once: true }}
               className="flex items-center gap-4"
             >
               <div className="p-2 bg-blue-800/30 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
@@ -184,7 +171,10 @@ export default function Version3Section() {
             </motion.div>
             
             <motion.div
-              variants={fadeInUp}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 1.0 }}
+              viewport={{ once: true }}
               className="flex items-center gap-4"
             >
               <div className="p-2 bg-green-500/30 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
@@ -195,27 +185,28 @@ export default function Version3Section() {
                 <p className="text-green-400/80 text-sm">AI co-creation, meta-cognition, self-evolving intelligence system</p>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         </motion.div>
         
         {/* 3-Week Mastery Case Study */}
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={0.8}
-          className="bg-black/50 p-6 md:p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 1.1 }}
+          viewport={{ once: true }}
+          className="bg-black/50 p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-16"
         >
           <h3 className="text-2xl font-bold text-green-400 mb-6">The 3-Week Mastery Case Study</h3>
           
           <div className="relative flex flex-col md:flex-row gap-6 mb-6">
-            {/* Timeline bar - only shown on MD+ */}
+            {/* Timeline bar */}
             <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-green-800/50 -translate-x-1/2 z-0"></div>
             
             <motion.div 
-              variants={fadeInUp}
-              custom={0.9}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 1.2 }}
+              viewport={{ once: true }}
               className="md:w-1/2 p-6 bg-black/60 rounded-lg border border-green-500/30 relative z-10"
             >
               <h4 className="text-xl font-bold text-white mb-2">Week 1: Framework Building</h4>
@@ -231,8 +222,10 @@ export default function Version3Section() {
             <div className="md:w-1/2"></div>
             
             <motion.div 
-              variants={fadeInUp}
-              custom={1.0}
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 1.3 }}
+              viewport={{ once: true }}
               className="md:w-1/2 p-6 bg-black/60 rounded-lg border border-green-500/30 relative z-10"
             >
               <h4 className="text-xl font-bold text-white mb-2">Week 2: Co-Creative Implementation</h4>
@@ -244,8 +237,10 @@ export default function Version3Section() {
             <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-green-800/50 -translate-x-1/2 z-0"></div>
             
             <motion.div 
-              variants={fadeInUp}
-              custom={1.1}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 1.4 }}
+              viewport={{ once: true }}
               className="md:w-1/2 p-6 bg-black/60 rounded-lg border border-green-500/30 relative z-10"
             >
               <h4 className="text-xl font-bold text-white mb-2">Week 3: Meta-Cognitive Integration</h4>
@@ -258,23 +253,22 @@ export default function Version3Section() {
         
         {/* Measurable Results */}
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={1.2}
-          className="bg-gradient-to-br from-green-900/30 to-black rounded-xl border border-green-500/30 p-6 md:p-8"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 1.5 }}
+          viewport={{ once: true }}
+          className="bg-black p-8 rounded-xl border border-green-500/30"
         >
           <h3 className="text-2xl font-bold text-green-400 mb-6">Beyond Conventional AI Usage</h3>
           
-          <motion.div 
-            variants={staggerChildren}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {benefitsData.map((benefit, index) => (
               <motion.div 
                 key={index}
-                variants={fadeInUp}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 1.6 + (index * 0.15) }}
+                viewport={{ once: true }}
                 className="flex items-center gap-3"
               >
                 <div className="bg-green-500/20 p-2 rounded-full">
@@ -283,25 +277,26 @@ export default function Version3Section() {
                 <p className="text-white/80">{benefit}</p>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
           
           <motion.div 
-            variants={fadeInUp}
-            custom={1.5}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 2.0 }}
+            viewport={{ once: true }}
             className="mt-8 flex justify-center"
           >
-            <motion.a
-              href="#contact"
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               className="px-8 py-3 bg-green-500/20 border border-green-500 rounded-full text-green-400 font-bold flex items-center gap-2 transition-all group"
             >
               <span>Experience The System</span>
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </motion.a>
+            </motion.button>
           </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }
