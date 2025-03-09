@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@react-three/drei": "^10.0.2",
-    "@react-three/fiber": "^9.0.4",
+    "@react-three/drei": "^10.0.4",
+    "@react-three/fiber": "^9.1.0",
     "@types/react-scroll": "^1.8.10",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
@@ -23,6 +23,8 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
     "react-scroll": "^1.9.3",
+    "react-use": "^17.6.0",
+    "resize-observer-polyfill": "^1.5.1",
     "three": "^0.173.0"
   },
   "devDependencies": {

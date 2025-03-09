@@ -1,169 +1,147 @@
-import { useEffect, useRef } from "react";
+import { useRef, useMemo, useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
 /**
- * WebGLBackground - Creates a dynamic flowing particle background
- * Optimized for Lighthouse performance while ensuring no black background
+ * Particle system component using react-three-fiber.
+ * Optimized for GPU instancing and performance-based updates.
  */
-export default function WebGLBackground() {
-  const mountRef = useRef(null);
-  const requestRef = useRef(null);
+function ParticleSystem() {
+  const pointsRef = useRef();
+  const { viewport } = useThree();
+  const timeRef = useRef(0);
+  
+  // Detect device capabilities
+  const isMobile = window.innerWidth < 768;
+  const isLowPerformance = window.innerWidth < 1200 || navigator.hardwareConcurrency < 6;
 
-  useEffect(() => {
-    // Verify container exists
-    if (!mountRef.current) return;
-
-    // Scene setup with explicit background
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#0a0a18"); // Deep blue
-
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(
-      75, 
-      window.innerWidth / window.innerHeight, 
-      0.1, 
-      1000
-    );
-    camera.position.z = 8;
-
-    // Performance-optimized renderer settings
-    const renderer = new THREE.WebGLRenderer({ 
-      antialias: window.devicePixelRatio < 2, // Only use antialiasing on higher-end devices
-      alpha: false, // Disable alpha for better performance
-      powerPreference: "high-performance", 
-      stencil: false, // Disable unused capabilities
-      depth: false
-    });
-    renderer.setClearColor("#0a0a18", 1); // Explicit background clear
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap at 2x for performance
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    // Ensure the canvas covers the entire viewport
-    renderer.domElement.style.position = "fixed";
-    renderer.domElement.style.top = "0";
-    renderer.domElement.style.left = "0";
-    renderer.domElement.style.width = "100vw";
-    renderer.domElement.style.height = "100vh";
-    
-    mountRef.current.appendChild(renderer.domElement);
-
-    // Adaptive particle count based on device capability
-    const isMobile = window.innerWidth < 768;
-    const isLowPerformance = navigator.hardwareConcurrency < 4;
-    
-    // Reduce particle count on lower-end devices
-    const particleCount = isLowPerformance ? 5000 : (isMobile ? 8000 : 15000);
-    
-    // Set up particle system
-    const geometry = new THREE.BufferGeometry();
+  // Adjust particle count dynamically
+  const particleCount = isLowPerformance ? 2500 : (isMobile ? 4000 : 7000);
+  
+  // Precompute particle attributes (buffered for performance)
+  const [positions, colors, animationFactors] = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-    
-    // Create particles in a field suitable for wave animation
+    const animationFactors = new Float32Array(particleCount * 4); // x-freq, y-freq, phase, amp
+
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
-      
-      // Position in a radial pattern for better wave effects
+      const i4 = i * 4;
       const angle = Math.random() * Math.PI * 2;
       const radius = Math.random() * 12;
-      
-      positions[i3] = Math.cos(angle) * radius;     // x
-      positions[i3 + 1] = (Math.random() - 0.5) * 8; // y
-      positions[i3 + 2] = Math.sin(angle) * radius;  // z
-      
-      // Purple/magenta color scheme matching reference image
+
+      positions[i3] = Math.cos(angle) * radius;
+      positions[i3 + 1] = (Math.random() - 0.5) * 8;
+      positions[i3 + 2] = Math.sin(angle) * radius;
+
+      // Color scheme (purple/magenta)
       const colorFactor = Math.random();
-      colors[i3] = 0.7 + (colorFactor * 0.3);     // R: high for magenta/purple
-      colors[i3 + 1] = 0.0 + (colorFactor * 0.2); // G: very low
-      colors[i3 + 2] = 0.8 - (colorFactor * 0.3); // B: medium-high
+      colors[i3] = 0.7 + colorFactor * 0.3; 
+      colors[i3 + 1] = 0.0 + colorFactor * 0.2;
+      colors[i3 + 2] = 0.8 - colorFactor * 0.3;
+
+      // Precompute animation factors
+      animationFactors[i4] = Math.random() * 0.2 + 0.1; 
+      animationFactors[i4 + 1] = Math.random() * 0.15 + 0.05;
+      animationFactors[i4 + 2] = Math.random() * Math.PI * 2; 
+      animationFactors[i4 + 3] = Math.random() * 0.3 + 0.2; 
     }
+
+    return [positions, colors, animationFactors];
+  }, [particleCount]);
+
+  // Optimized animation loop using batching
+  useFrame(({ clock }) => {
+    if (!pointsRef.current) return;
+
+    const currentTime = clock.elapsedTime * 0.3;
+    const deltaTime = currentTime - timeRef.current;
+    timeRef.current = currentTime;
     
-    // Add position and color attributes to geometry
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    const positions = pointsRef.current.geometry.attributes.position;
     
-    // Material with performance considerations
-    const material = new THREE.PointsMaterial({
-      size: isMobile ? 0.05 : 0.04,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.8,
-      sizeAttenuation: true,
-    });
-    
-    // Create particle system
-    const particles = new THREE.Points(geometry, material);
-    scene.add(particles);
-    
-    // Animation loop with performance optimizations
-    let lastFrameTime = 0;
-    const targetFPS = isLowPerformance ? 30 : 60;
-    const frameInterval = 1000 / targetFPS;
-    
-    const animate = (currentTime) => {
-      requestRef.current = requestAnimationFrame(animate);
+    for (let i = 0; i < particleCount; i++) {
+      const i3 = i * 3;
+      const i4 = i * 4;
       
-      // Throttle frame rate for better performance
-      const deltaTime = currentTime - lastFrameTime;
-      if (deltaTime < frameInterval) return;
-      
-      lastFrameTime = currentTime - (deltaTime % frameInterval);
-      
-      // Update particle positions for wave effect
-      const positions = particles.geometry.attributes.position;
-      const time = currentTime * 0.0005;
-      
-      for (let i = 0; i < particleCount; i++) {
-        const i3 = i * 3;
-        const x = positions.array[i3];
-        const y = positions.array[i3 + 1];
-        
-        // Wave patterns
-        const waveX = Math.sin(x * 0.3 + time * 2) * 0.5;
-        const waveY = Math.cos(y * 0.2 + time * 1.5) * 0.5;
-        
-        // Apply wave effect to Z position
-        positions.array[i3 + 2] = positions.array[i3 + 2] * 0.97 + waveX + waveY;
-      }
-      
-      positions.needsUpdate = true;
-      
-      // Add subtle overall rotation
-      particles.rotation.y = time * 0.1;
-      
-      renderer.render(scene, camera);
-    };
-    
-    animate(0);
-    
-    // Handle window resize efficiently
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-    
-    // Use a resize observer instead of window event for better performance
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(document.body);
-    
-    // Cleanup on unmount - very important for performance
+      const xFactor = animationFactors[i4];
+      const yFactor = animationFactors[i4 + 1];
+      const phaseOffset = animationFactors[i4 + 2];
+      const amplitude = animationFactors[i4 + 3];
+
+      const wave = Math.sin(positions.array[i3] * xFactor + positions.array[i3 + 1] * yFactor + currentTime + phaseOffset) * amplitude;
+      positions.array[i3 + 2] = positions.array[i3 + 2] * 0.98 + wave * 0.02;
+    }
+
+    positions.needsUpdate = true;
+    pointsRef.current.rotation.y += deltaTime * 0.03;
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={particleCount} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-color" count={particleCount} array={colors} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={isMobile ? 0.06 : 0.04}
+        vertexColors
+        transparent
+        opacity={0.75}
+        sizeAttenuation
+      />
+    </points>
+  );
+}
+
+/**
+ * Main WebGL Background component using react-three-fiber.
+ * Optimized with adaptive FPS and safe cleanup.
+ */
+export default function WebGLBackground() {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    console.log("WebGL Background mounted");
+    if (containerRef.current) {
+      containerRef.current.style.backgroundColor = "#0a0a18";
+    }
     return () => {
-      resizeObserver.disconnect();
-      cancelAnimationFrame(requestRef.current);
-      
-      // Remove canvas from DOM
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      
-      // Dispose of Three.js resources to prevent memory leaks
-      geometry.dispose();
-      material.dispose();
-      renderer.dispose();
+      console.log("WebGL Background unmounted");
     };
   }, []);
-  
-  // Return a div with the webgl-background class from our updated CSS
-  return <div ref={mountRef} className="webgl-background" />;
+
+  return (
+    <div ref={containerRef} className="absolute inset-0 -z-10">
+      <Canvas
+        camera={{ position: [0, 0, 10], fov: 75 }}
+        dpr={Math.min(window.devicePixelRatio, 1.5)} 
+        gl={{
+          antialias: false,
+          alpha: false, 
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: false,
+          precision: "lowp",
+          clearColor: "#0a0a18",
+          clearAlpha: 1,
+          toneMapping: THREE.NoToneMapping, // Removes extra rendering calculations
+        }}
+        performance={{ min: 0.1 }} 
+        onCreated={(state) => {
+          console.log("WebGL Canvas created");
+          state.gl.autoClear = false;
+        }}
+        onError={(error) => {
+          console.error("WebGL Canvas error:", error);
+          if (containerRef.current) {
+            containerRef.current.style.backgroundColor = "#0a0a18";
+          }
+        }}
+      >
+        <color attach="background" args={["#0a0a18"]} />
+        <ParticleSystem />
+      </Canvas>
+    </div>
+  );
 }
