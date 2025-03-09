@@ -1,23 +1,39 @@
-import { motion } from 'framer-motion'
-import { useState } from 'react'
-import Navbar from './components/Navbar'
-import { 
-  HeroSection,
-  MetaCurtisSection,
-  Version3Section,
-  AboutSection
-} from './components/sections'
+import React, { Suspense, lazy } from "react";
+import WebGLBackground from "./layouts/WebGLBackground"; // ✅ Ensures Background Persistence
+
+// 🚀 Lazy-load all sections for optimized performance
+const Navbar = lazy(() => import("./components/Navbar"));
+const HeroSection = lazy(() => import("./sections/HeroSection"));
+const MetaCurtisSection = lazy(() => import("./sections/MetaCurtisSection"));
+const Version3Section = lazy(() => import("./sections/Version3Section"));
+const AboutSection = lazy(() => import("./sections/AboutSection"));
+const TheSystemSection = lazy(() => import("./sections/TheSystemSection"));
+const ContactSection = lazy(() => import("./sections/ContactSection"));
 
 function App() {
   return (
-    <div className="bg-black">
-      <Navbar />
-      <HeroSection />
-      <MetaCurtisSection />
-      <Version3Section />
-      <AboutSection />
+    <div className="relative">
+      {/* ✅ Background will persist but NOT block sections */}
+      <WebGLBackground className="absolute inset-0 -z-10" />
+
+      {/* ✅ Optimized Lazy-loading with Suspense */}
+      <Suspense fallback={<div className="text-white">Loading...</div>}>
+        <Navbar />
+      </Suspense>
+
+      {/* ✅ Sections are now properly layered ABOVE the background */}
+      <main className="relative z-10">
+        <Suspense fallback={<div className="text-white">Loading Sections...</div>}>
+          <HeroSection />
+          <MetaCurtisSection />
+          <Version3Section />
+          <TheSystemSection />
+          <AboutSection />
+          <ContactSection />
+        </Suspense>
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

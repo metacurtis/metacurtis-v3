@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-scroll";
 import { useMemo, useEffect } from "react";
-import WebGLBackground from "../WebGLBackground";
+import WebGLBackground from "../layouts/WebGLBackground";
+
 
 // Animation Variants (Lazy Loaded for Performance)
 const fadeIn = {
