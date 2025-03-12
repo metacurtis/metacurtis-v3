@@ -1,13 +1,13 @@
 import { useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useWindowSize } from "react-use";
 
 /**
  * 🌊 Continuous Wave-Like Particle System
  */
-function ParticleSystem() {
-  const pointsRef = useRef();
+export default function ParticleSystem() {
+  const pointsRef = useRef(null);
   const timeRef = useRef(0);
 
   // **Detect device capabilities**
@@ -16,10 +16,10 @@ function ParticleSystem() {
   const isLowPerformance = width < 1200 || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 6);
 
   // **Adaptive Particle Count**
-  const particleCount = isLowPerformance ? 5000 : isMobile ? 8000 : 15000;
+  const particleCount = useRef(isLowPerformance ? 5000 : isMobile ? 8000 : 15000).current;
 
   // **Precompute Particle Attributes**
-  const [positions, colors, motionFactors] = useMemo(() => {
+  const { positions, colors, motionFactors } = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const motionFactors = new Float32Array(particleCount * 5); // x-freq, y-freq, phase, amp, speed
@@ -49,7 +49,7 @@ function ParticleSystem() {
       motionFactors[i5 + 4] = Math.random() * 0.05 + 0.02; // speed
     }
 
-    return [positions, colors, motionFactors];
+    return { positions, colors, motionFactors };
   }, [particleCount]);
 
   // **Continuous Flowing Wave Effect**
@@ -60,7 +60,8 @@ function ParticleSystem() {
     const deltaTime = currentTime - timeRef.current;
     timeRef.current = currentTime;
 
-    const positions = pointsRef.current.geometry.attributes.position;
+    const posAttribute = pointsRef.current.geometry.attributes.position;
+    const posArray = posAttribute.array; // ✅ Modify the existing array, do not reassign
 
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
@@ -74,19 +75,19 @@ function ParticleSystem() {
 
       // **Create a Wave-Like Flow**
       const wave = Math.sin(
-        positions.array[i3] * xFactor +
-        positions.array[i3 + 1] * yFactor +
+        posArray[i3] * xFactor +
+        posArray[i3 + 1] * yFactor +
         currentTime +
         phaseOffset
       ) * amplitude;
 
       // **Apply the Wave Effect**
-      positions.array[i3] += Math.sin(currentTime * 0.5 + i * 0.1) * speed;
-      positions.array[i3 + 1] += Math.cos(currentTime * 0.3 + i * 0.1) * speed;
-      positions.array[i3 + 2] += wave * 0.02;
+      posArray[i3] += Math.sin(currentTime * 0.5 + i * 0.1) * speed;
+      posArray[i3 + 1] += Math.cos(currentTime * 0.3 + i * 0.1) * speed;
+      posArray[i3 + 2] += wave * 0.02;
     }
 
-    positions.needsUpdate = true;
+    posAttribute.needsUpdate = true; // ✅ Ensure changes apply without resizing
 
     // **Subtle Rotation for Depth**
     pointsRef.current.rotation.y += deltaTime * 0.02;
@@ -101,6 +102,7 @@ function ParticleSystem() {
           count={particleCount} 
           array={positions} 
           itemSize={3} 
+          usage={THREE.DynamicDrawUsage} // ✅ Prevent Buffer Errors
         />
         <bufferAttribute 
           attach="attributes-color" 
@@ -117,23 +119,5 @@ function ParticleSystem() {
         sizeAttenuation
       />
     </points>
-  );
-}
-
-/**
- * 🎨 WebGL Background with Continuous Flowing Particles
- */
-export default function WebGLBackground() {
-  return (
-    <div className="fixed inset-0 -z-10">
-      <Canvas
-        camera={{ position: [0, 0, 12], fov: 75 }}
-        dpr={Math.min(window.devicePixelRatio, 1.5)}
-        gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
-        performance={{ max: 0.5 }}
-      >
-        <ParticleSystem />
-      </Canvas>
-    </div>
   );
 }

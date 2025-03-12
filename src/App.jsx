@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import WebGLBackground from "./layouts/WebGLBackground"; // ✅ Ensures Background Persistence
+import WebGLBackground from "./backgrounds/WebGLBackground"; // ✅ Ensures Background Persistence
 
 // 🚀 Lazy-load all sections for optimized performance
 const Navbar = lazy(() => import("./components/Navbar"));
@@ -9,6 +9,7 @@ const Version3Section = lazy(() => import("./sections/Version3Section"));
 const AboutSection = lazy(() => import("./sections/AboutSection"));
 const TheSystemSection = lazy(() => import("./sections/TheSystemSection"));
 const ContactSection = lazy(() => import("./sections/ContactSection"));
+
 
 function App() {
   return (

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Suspense, useEffect } from "react";
 import { Typewriter } from "react-simple-typewriter";
-import WebGLBackground from "../layouts/WebGLBackground";
+import WebGLBackground from "../backgrounds/WebGLBackground";
 
 // Animation Variants
 const fadeIn = {
