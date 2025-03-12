@@ -1,0 +1,331 @@
+/* Version3Section.css */
+/* Glass morphism styles to let WebGL background show through */
+.story-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  z-index: 10;
+}
+
+.chapter {
+  position: relative;
+  margin-bottom: 8rem;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  background: rgba(10, 10, 24, 0.4);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: perspective(1000px) rotateX(0deg);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chapter-active {
+  background: rgba(15, 15, 35, 0.6);
+  border: 1px solid rgba(255, 0, 255, 0.1);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5),
+              0 0 15px rgba(255, 0, 255, 0.2);
+}
+
+.chapter-header {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff00ff 0%, #b000ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+.chapter-content {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.chapter-content p {
+  margin-bottom: 1.5rem;
+}
+
+/* Interactive elements styling */
+.highlight {
+  color: #38bdf8;
+  font-weight: 500;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.emphasis {
+  color: #ff66ff;
+  font-weight: 600;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.visual-container, 
+.feedback-loop, 
+.code-evolution, 
+.journey-end {
+  margin: 3rem 0;
+  position: relative;
+  height: 150px;
+}
+
+/* Journey path styles */
+.journey-path {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.8), rgba(255, 0, 255, 0.8));
+  transform: translateY(-50%);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  z-index: 1;
+}
+
+.journey-node {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(15, 15, 35, 0.8);
+  border: 2px solid #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+  z-index: 2;
+  opacity: 0;
+  scale: 0;
+}
+
+.node-label {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+/* Feedback loop styles */
+.feedback-loop {
+  height: 250px;
+}
+
+.feedback-node {
+  position: absolute;
+  width: auto;
+  min-width: 150px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background: rgba(15, 15, 35, 0.8);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  color: white;
+  text-align: center;
+  font-weight: 500;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+  z-index: 2;
+  opacity: 0;
+  scale: 0;
+}
+
+.loop-arrow {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 0, 255, 0.8), rgba(176, 0, 255, 0.8));
+  opacity: 0;
+  z-index: 1;
+}
+
+.loop-arrow::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid rgba(255, 0, 255, 0.8);
+  border-right: 2px solid rgba(255, 0, 255, 0.8);
+  transform: rotate(45deg);
+}
+
+/* Code evolution styles */
+.code-evolution {
+  position: relative;
+  height: 320px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  margin: 2rem 0;
+}
+
+.code-step {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  opacity: 0;
+  white-space: pre-wrap;
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  overflow: auto;
+}
+
+.code-step::before {
+  content: attr(data-step);
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.8rem;
+}
+
+.code-step.active {
+  opacity: 1;
+}
+
+/* Journey end with pulse */
+.journey-end {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+}
+
+.pulse {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 0, 255, 0.2);
+  border: 2px solid rgba(255, 0, 255, 0.5);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+  opacity: 0.5;
+  transform: scale(0.8);
+}
+
+/* Typewriter effect */
+.typewriter {
+  overflow: hidden;
+  position: relative;
+}
+
+/* Animation utility classes */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 15s ease infinite alternate;
+  background-size: 200% 200%;
+}
+
+/* Custom glow effect */
+@keyframes glow-pulse {
+  0% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    filter: hue-rotate(30deg) brightness(1.2);
+  }
+  100% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Improved accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-gradient-shift,
+  .animate-glow-pulse {
+    animation: none;
+  }
+  
+  .journey-path,
+  .journey-node,
+  .feedback-node,
+  .loop-arrow,
+  .code-step,
+  .pulse {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chapter {
+    padding: 1.5rem;
+  }
+  
+  .chapter-header {
+    font-size: 1.8rem;
+  }
+  
+  .visual-container, 
+  .feedback-loop {
+    height: 200px;
+  }
+  
+  .code-evolution {
+    height: 250px;
+  }
+  
+  .feedback-node {
+    min-width: 120px;
+    font-size: 0.9rem;
+  }
+  
+  .node-label {
+    width: 100px;
+    font-size: 0.7rem;
+  }
+}
+
+/* Custom tailwind extensions */
+@layer utilities {
+  .letter-spacing-wider {
+    letter-spacing: 1px;
+  }
+  
+  .outer-button {
+    position: relative;
+    min-height: 40px;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .outer-button:hover {
+    transform: scale(1.05);
+  }
+}

@@ -1,6 +1,8 @@
 import React from "react";
+import Version3Particles from "../components/particles/Version3Particles";
 import { Canvas } from "@react-three/fiber";
-import ParticleSystem from "../components/particles/ParticleSystem";
+import Version3Particles from "../components/particles/Version3Particles";
+import ParticleSystem from "../components/particles/ParticleSystem"; // ✅ Ensure correct path
 
 /**
  * 🎨 WebGL Background with Particle System
@@ -17,6 +19,7 @@ export default function WebGLBackground() {
         performance={{ max: 0.5 }}
       >
         <ParticleSystem />
+        <Version3Particles />
       </Canvas>
     </div>
   );

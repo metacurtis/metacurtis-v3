@@ -1,306 +1,437 @@
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { Brain, Zap, ArrowRight, CheckCircle, RefreshCw, Layers } from 'lucide-react';
+// Enhanced Version3Section.jsx
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import { Typewriter } from "react-simple-typewriter";
+import "./Version3Section.css";
+
+// Animation variants to match your existing styles
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 1.2, delay, ease: "easeOut" },
+  }),
+};
 
 export default function Version3Section() {
-  // Memoize data to prevent unnecessary recalculations
-  const stepsData = useMemo(() => [
-    {
-      icon: <Brain size={24} />,
-      title: "Meta Learning Framework",
-      description: "Engineering optimized learning pathways by breaking complex skills into feedback-rich microloops.",
-      color: "#10B981" // green
-    },
-    {
-      icon: <Zap size={24} />,
-      title: "AI-Human Co-Creation",
-      description: "Developing structured AI workflows that transform AI from a tool into an active thought partner.",
-      color: "#8B5CF6" // purple
-    },
-    {
-      icon: <RefreshCw size={24} />,
-      title: "Accelerated Feedback Loop",
-      description: "Creating self-optimizing cycles where both human and AI capabilities expand exponentially with each iteration.",
-      color: "#3B82F6" // blue
-    }
-  ], []);
-
-  const benefitsData = useMemo(() => [
-    "3x faster skill acquisition and implementation",
-    "AI becomes a true cognitive extension, not just a tool",
-    "Self-improving feedback loops for continuous growth",
-    "Meta-awareness that transcends conventional learning limitations"
-  ], []);
-
-  // Animation variants - defined outside render for better performance
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (delay = 0) => ({
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        duration: 0.6, 
-        delay, 
-        ease: "easeOut" 
-      }
-    })
+  const storyContainerRef = useRef(null);
+  const [activeChapter, setActiveChapter] = useState(0);
+  
+  // Custom event dispatcher for WebGL particles
+  const updateParticles = (chapterIndex) => {
+    window.dispatchEvent(
+      new CustomEvent("version3-chapter-change", { 
+        detail: { chapterIndex } 
+      })
+    );
   };
 
-  const staggerChildren = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const storyContainer = storyContainerRef.current;
+    if (!storyContainer) return;
+
+    // Collect cleanup functions so that we can return one combined cleanup
+    const cleanupFunctions = [];
+
+    // Create a master timeline for coordinated animations
+    const masterTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: storyContainer,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 0.5,
+      },
+    });
+
+    // Chapter reveals with glass morphism effect
+    const chapters = storyContainer.querySelectorAll(".chapter");
+    chapters.forEach((chapter, index) => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: chapter,
+          start: "top 80%",
+          end: "bottom 20%",
+          toggleActions: "play none none reverse",
+          onEnter: () => {
+            setActiveChapter(index);
+            updateParticles(index);
+          },
+          onEnterBack: () => {
+            setActiveChapter(index);
+            updateParticles(index);
+          },
+        },
+      });
+
+      const paragraphs = chapter.querySelectorAll("p");
+      tl.fromTo(
+        chapter,
+        { opacity: 0, y: 50, filter: "blur(5px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8, ease: "power2.out" }
+      );
+
+      tl.fromTo(
+        paragraphs,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, stagger: 0.2, duration: 0.5, ease: "power1.out" },
+        "-=0.4"
+      );
+
+      masterTimeline.to(
+        chapter,
+        { y: index % 2 === 0 ? -30 : -50, ease: "none" },
+        0
+      );
+    });
+
+    // Visual journey paths animation
+    const visualContainers = storyContainer.querySelectorAll(".visual-container");
+    visualContainers.forEach((container) => {
+      const journeyPath = container.querySelector(".journey-path");
+      const journeyNodes = container.querySelectorAll(".journey-node");
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: container,
+          start: "top 70%",
+          end: "bottom 20%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      if (journeyPath) {
+        tl.fromTo(
+          journeyPath,
+          { width: "0%" },
+          { width: "100%", duration: 1.5, ease: "power2.inOut" }
+        );
       }
+
+      if (journeyNodes.length) {
+        tl.fromTo(
+          journeyNodes,
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, stagger: 0.2, duration: 0.5, ease: "back.out(1.7)" },
+          "-=1"
+        );
+      }
+    });
+
+    // Code evolution with typewriter effect
+    const codeSteps = storyContainer.querySelectorAll(".code-step");
+    if (codeSteps.length) {
+      let currentStep = 0;
+      const codeTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".code-evolution",
+          start: "top 70%",
+          end: "bottom 20%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      codeTimeline.fromTo(
+        codeSteps[0],
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }
+      );
+
+      const codeInterval = setInterval(() => {
+        gsap.to(codeSteps[currentStep], {
+          opacity: 0,
+          y: -10,
+          duration: 0.5,
+          ease: "power1.in",
+          onComplete: () => {
+            currentStep = (currentStep + 1) % codeSteps.length;
+            gsap.fromTo(
+              codeSteps[currentStep],
+              { opacity: 0, y: 10 },
+              { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+            );
+          },
+        });
+      }, 4000);
+      cleanupFunctions.push(() => clearInterval(codeInterval));
     }
-  };
+
+    // Feedback loop animation
+    const feedbackLoop = storyContainer.querySelector(".feedback-loop");
+    if (feedbackLoop) {
+      const nodes = feedbackLoop.querySelectorAll(".feedback-node");
+      const arrows = feedbackLoop.querySelectorAll(".loop-arrow");
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: feedbackLoop,
+          start: "top 70%",
+          end: "bottom 20%",
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      tl.fromTo(
+        nodes,
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, stagger: 0.2, duration: 0.5, ease: "back.out(1.7)" }
+      );
+
+      tl.fromTo(
+        arrows,
+        { opacity: 0, width: 0 },
+        { opacity: 0.7, width: "100px", stagger: 0.15, duration: 0.6, ease: "power2.inOut" },
+        "-=0.8"
+      );
+
+      gsap.to([nodes, arrows], {
+        scale: 1.05,
+        opacity: (opacity) => opacity * 1.2,
+        repeat: -1,
+        yoyo: true,
+        duration: 2,
+        ease: "sine.inOut",
+        stagger: 0.05,
+      });
+    }
+
+    // Pulse animation for journey end
+    const journeyEnd = storyContainer.querySelector(".journey-end");
+    if (journeyEnd) {
+      const pulse = journeyEnd.querySelector(".pulse");
+      
+      gsap.to(pulse, {
+        scrollTrigger: {
+          trigger: journeyEnd,
+          start: "top 70%",
+          toggleActions: "play none none none",
+        },
+        scale: 1.2,
+        opacity: 0.8,
+        repeat: -1,
+        yoyo: true,
+        duration: 1.5,
+        ease: "sine.inOut",
+      });
+    }
+
+    // Enhanced highlight and emphasis animations
+    const highlights = storyContainer.querySelectorAll(".highlight, .emphasis");
+    highlights.forEach((highlight) => {
+      gsap.to(highlight, {
+        scrollTrigger: {
+          trigger: highlight,
+          start: "top 90%",
+        },
+        color: highlight.classList.contains("emphasis") ? "#ff00ff" : "#38bdf8",
+        textShadow: highlight.classList.contains("emphasis")
+          ? "0 0 8px rgba(255, 0, 255, 0.4)"
+          : "0 0 8px rgba(56, 189, 248, 0.4)",
+        duration: 0.5,
+        ease: "power1.out",
+      });
+    });
+
+    // Return a combined cleanup function
+    return () => {
+      cleanupFunctions.forEach((fn) => fn());
+    };
+  }, []);
 
   return (
     <section 
       id="version-3" 
-      className="min-h-screen bg-[var(--bg-deep-blue)] flex flex-col items-center p-4 md:p-8 relative overflow-hidden gpu-accelerated"
+      className="relative min-h-screen w-full overflow-hidden"
+      aria-labelledby="version-3-heading"
     >
-      {/* Subtle Background Motion - simplified for better performance */}
-      <div
-        className="absolute inset-0 opacity-10 pointer-events-none"
-        style={{
-          backgroundImage: 'linear-gradient(45deg, rgb(16 185 129 / 0.2) 0%, transparent 70%)',
-          backgroundSize: '200% 200%',
-          backgroundPosition: '0% 0%'
-        }}
-      />
-
-      <div className="max-w-4xl w-full z-10">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={staggerChildren}
-          className="mb-12"
+      {/* Section Header */}
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="text-center py-12 relative z-10"
+      >
+        <h2 
+          id="version-3-heading"
+          className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500"
         >
-          <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 flex flex-wrap items-baseline gap-3">
-            <motion.span variants={fadeInUp} custom={0.2} className="text-white">
-              The
-            </motion.span>
-            <motion.span variants={fadeInUp} custom={0.4} className="text-green-500">
-              System
-            </motion.span>
-          </h2>
-          
-          <motion.p
-            variants={fadeInUp}
-            custom={0.5}
-            className="text-xl text-white/80 mb-8 max-w-2xl"
-          >
-            A next-generation approach to human-AI integration where transformation isn't luck—it's engineered.
-          </motion.p>
-        </motion.div>
+          Version 3 Story
+        </h2>
+        <p className="mt-4 text-white/60 max-w-2xl mx-auto">
+          <Typewriter
+            words={["The evolution of learning at the speed of thought..."]}
+            typeSpeed={40}
+            cursor
+            cursorStyle="_"
+          />
+        </p>
+      </motion.div>
+      
+      {/* Main Story Container */}
+      <div ref={storyContainerRef} className="story-container relative z-10 pb-16">
+        {/* Chapter 1 */}
+        <section id="chapter1" className={`chapter ${activeChapter === 0 ? "chapter-active" : ""}`}>
+          <h2 className="chapter-header typewriter">The Spark of Curiosity</h2>
+          <div className="chapter-content">
+            <p>
+              In the beginning, there was <span className="highlight">confusion</span>. A hazy understanding of what could be.
+            </p>
+            <p>
+              The journey of <span className="emphasis">Meta Curtis</span> began not with certainty, but with a simple spark of <span className="highlight">curiosity</span>.
+            </p>
+            <p>
+              What if learning could be <span className="emphasis">accelerated</span>? What if the traditional paths of education could be reimagined?
+            </p>
 
-        {/* The System Core Framework */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={0.6}
-          className="bg-black/50 p-6 md:p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-12"
-        >
-          <h3 className="text-2xl font-bold text-green-400 mb-6">The MetaCurtis AI Integration Model</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {stepsData.map((step, index) => (
-              <motion.div 
-                key={index}
-                variants={fadeInUp}
-                custom={0.7 + (index * 0.1)}
-                whileHover={{ scale: 1.03 }}
-                className="p-6 bg-black/60 rounded-lg border border-green-500/30 transition-all duration-300 flex flex-col"
-                style={{ 
-                  boxShadow: `0 0 10px ${step.color}20`
-                }}
-              >
-                <div className="p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4" style={{ backgroundColor: `${step.color}30` }}>
-                  <div style={{ color: step.color }}>{step.icon}</div>
-                </div>
-                <h4 className="text-xl font-bold text-white mb-2">{step.title}</h4>
-                <p className="text-white/60 flex-grow">{step.description}</p>
-                
-                <motion.div 
-                  className="mt-4 w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: `${step.color}30` }}
-                  whileHover={{ rotate: 90 }}
+            <div className="visual-container">
+              <div className="journey-path"></div>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div 
+                  key={`node-${index}`} 
+                  className="journey-node" 
+                  style={{ left: `${10 + index * 20}%` }}
                 >
-                  {index < stepsData.length - 1 ? (
-                    <ArrowRight size={16} style={{ color: step.color }} />
-                  ) : (
-                    <CheckCircle size={16} style={{ color: step.color }} />
-                  )}
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-        
-        {/* Evolution Layer */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={0.7}
-          className="bg-black/50 p-6 md:p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-12"
-        >
-          <h3 className="text-2xl font-bold text-green-400 mb-6">AI-Human Integration Layers</h3>
-          
-          <motion.div 
-            variants={staggerChildren}
-            className="flex flex-col space-y-4"
-          >
-            <motion.div
-              variants={fadeInUp}
-              className="flex items-center gap-4"
-            >
-              <div className="p-2 bg-gray-800/80 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
-                <Layers size={24} className="text-gray-400" />
-              </div>
-              <div className="p-4 bg-gray-900/60 rounded-lg border border-gray-700 flex-grow">
-                <h4 className="text-lg font-semibold text-gray-300">Basic AI Usage</h4>
-                <p className="text-gray-400 text-sm">Task-based automation, single-instance queries</p>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              variants={fadeInUp}
-              className="flex items-center gap-4"
-            >
-              <div className="p-2 bg-blue-800/30 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
-                <Layers size={24} className="text-blue-400" />
-              </div>
-              <div className="p-4 bg-blue-900/20 rounded-lg border border-blue-700/30 flex-grow">
-                <h4 className="text-lg font-semibold text-blue-300">Advanced AI Workflows</h4>
-                <p className="text-blue-400/80 text-sm">Structured prompts, iterative refinement, process optimization</p>
-              </div>
-            </motion.div>
-            
-            <motion.div
-              variants={fadeInUp}
-              className="flex items-center gap-4"
-            >
-              <div className="p-2 bg-green-500/30 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
-                <Layers size={24} className="text-green-400" />
-              </div>
-              <div className="p-4 bg-green-900/20 rounded-lg border border-green-500/30 flex-grow">
-                <h4 className="text-lg font-semibold text-green-300">The MetaCurtis Approach</h4>
-                <p className="text-green-400/80 text-sm">AI co-creation, meta-cognition, self-evolving intelligence system</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-        
-        {/* 3-Week Mastery Case Study */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={0.8}
-          className="bg-black/50 p-6 md:p-8 rounded-xl border border-green-500/20 backdrop-blur-sm mb-12"
-        >
-          <h3 className="text-2xl font-bold text-green-400 mb-6">The 3-Week Mastery Case Study</h3>
-          
-          <div className="relative flex flex-col md:flex-row gap-6 mb-6">
-            {/* Timeline bar - only shown on MD+ */}
-            <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-green-800/50 -translate-x-1/2 z-0"></div>
-            
-            <motion.div 
-              variants={fadeInUp}
-              custom={0.9}
-              className="md:w-1/2 p-6 bg-black/60 rounded-lg border border-green-500/30 relative z-10"
-            >
-              <h4 className="text-xl font-bold text-white mb-2">Week 1: Framework Building</h4>
-              <p className="text-white/70">Engineered AI-optimized learning pathways, developed structured prompt systems, created meta-learning feedback loops</p>
-            </motion.div>
-            
-            <div className="md:w-1/2"></div>
-          </div>
-          
-          <div className="relative flex flex-col md:flex-row gap-6 mb-6">
-            <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-green-800/50 -translate-x-1/2 z-0"></div>
-            
-            <div className="md:w-1/2"></div>
-            
-            <motion.div 
-              variants={fadeInUp}
-              custom={1.0}
-              className="md:w-1/2 p-6 bg-black/60 rounded-lg border border-green-500/30 relative z-10"
-            >
-              <h4 className="text-xl font-bold text-white mb-2">Week 2: Co-Creative Implementation</h4>
-              <p className="text-white/70">Established AI-human collaborative workflows, refined prompt engineering, developed pattern recognition at scale</p>
-            </motion.div>
-          </div>
-          
-          <div className="relative flex flex-col md:flex-row gap-6">
-            <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-green-800/50 -translate-x-1/2 z-0"></div>
-            
-            <motion.div 
-              variants={fadeInUp}
-              custom={1.1}
-              className="md:w-1/2 p-6 bg-black/60 rounded-lg border border-green-500/30 relative z-10"
-            >
-              <h4 className="text-xl font-bold text-white mb-2">Week 3: Meta-Cognitive Integration</h4>
-              <p className="text-white/70">Achieved self-evolving intelligence system, exponential output acceleration, complete web development mastery</p>
-            </motion.div>
-            
-            <div className="md:w-1/2"></div>
-          </div>
-        </motion.div>
-        
-        {/* Measurable Results */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          custom={1.2}
-          className="bg-gradient-to-br from-green-900/30 to-black rounded-xl border border-green-500/30 p-6 md:p-8"
-        >
-          <h3 className="text-2xl font-bold text-green-400 mb-6">Beyond Conventional AI Usage</h3>
-          
-          <motion.div 
-            variants={staggerChildren}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            {benefitsData.map((benefit, index) => (
-              <motion.div 
-                key={index}
-                variants={fadeInUp}
-                className="flex items-center gap-3"
-              >
-                <div className="bg-green-500/20 p-2 rounded-full">
-                  <CheckCircle size={16} className="text-green-400" />
+                  {index + 1}
+                  <div className="node-label">
+                    {[
+                      "Curiosity Ignites",
+                      "First Questions", 
+                      "Exploration Begins",
+                      "Vision Forms",
+                      "Path Revealed",
+                    ][index]}
+                  </div>
                 </div>
-                <p className="text-white/80">{benefit}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-          
-          <motion.div 
-            variants={fadeInUp}
-            custom={1.5}
-            className="mt-8 flex justify-center"
-          >
-            <motion.a
-              href="#about"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-3 bg-green-500/20 border border-green-500 rounded-full text-green-400 font-bold flex items-center gap-2 transition-all group"
-            >
-              <span>Experience The System</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </motion.a>
-          </motion.div>
-        </motion.div>
+              ))}
+            </div>
+
+            <p>
+              A journey that would normally take a computer science degree and years of practice was about to be transformed through a revolutionary approach: <span className="emphasis">Meta Learning</span>.
+            </p>
+          </div>
+        </section>
+
+        {/* Chapter 2 */}
+        <section id="chapter2" className={`chapter ${activeChapter === 1 ? "chapter-active" : ""}`}>
+          <h2 className="chapter-header">The First Steps</h2>
+          <div className="chapter-content">
+            <p>
+              From a simple <span className="emphasis">index.HTML chatbot</span>, the foundations were laid. The mountain of knowledge seemed insurmountable.
+            </p>
+            <p>
+              "Download VS Code," they said. "Learn JavaScript," they recommended. The traditional path stretched endlessly ahead, filled with roadblocks and years of study.
+            </p>
+
+            <div className="code-evolution">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div 
+                  key={`code-${index}`} 
+                  className={`code-step ${index === 0 ? "active" : ""}`} 
+                  data-step={index + 1}
+                >
+                  {[
+                    `<!DOCTYPE html>\n<html>\n  <head>\n    <title>Simple Chatbot</title>\n  </head>\n  <body>\n    <div class="chat-container">\n      <div class="chat-box"></div>\n    </div>\n  </body>\n</html>`,
+                    `// First JavaScript attempt\nfunction sendMessage() {\n  const message = document.getElementById('message').value;\n  if (message.trim() === '') return;\n\n  // Add message to chat\n  addMessage('user', message);\n}`,
+                    `// Learning TypeScript\ninterface Message {\n  sender: 'user' | 'bot';\n  content: string;\n  timestamp: Date;\n}\n\nfunction addMessage(message: Message): void {\n  // Implementation\n}`,
+                    `// Command line evolution\n$ npm init\n$ npm install typescript --save-dev\n$ npx tsc --init\n\n// Understanding errors\nTS2339: Property 'value' does not exist on type 'HTMLElement'.`,
+                    `#!/bin/bash\n\n# Automation script\necho "Setting up project environment..."\nmkdir -p src/components\n\n# Install dependencies\nnpm install react react-dom next tailwindcss\n\necho "Environment ready for development!"`,
+                  ][index]}
+                </div>
+              ))}
+            </div>
+
+            <p>
+              But <span className="emphasis">Meta Curtis</span> sought a different approach. What if the journey wasn't about memorizing syntax or spending years in classrooms?
+            </p>
+            <p>
+              What if it was about identifying the <span className="highlight">friction points</span> and systematically eliminating them?
+            </p>
+          </div>
+        </section>
+
+        {/* Chapter 3 */}
+        <section id="chapter3" className={`chapter ${activeChapter === 2 ? "chapter-active" : ""}`}>
+          <h2 className="chapter-header">The Feedback Loop</h2>
+          <div className="chapter-content">
+            <p>
+              This was the birth of <span className="emphasis">Meta Learning</span> – an accelerated path to knowledge acquisition through continuous feedback loops, reinforced by artificial intelligence.
+            </p>
+            <p>
+              Each iteration brought clarity where confusion once reigned. Each cycle eliminated friction points that once seemed immovable obstacles.
+            </p>
+
+            <div className="feedback-loop">
+              <div className="feedback-node" style={{ top: "0", left: "50%", transform: "translateX(-50%)" }}>
+                Identify Friction
+              </div>
+              <div className="feedback-node" style={{ top: "50%", left: "15%", transform: "translateY(-50%)" }}>
+                AI Prompt Engineering
+              </div>
+              <div className="feedback-node" style={{ top: "50%", right: "15%", transform: "translateY(-50%)" }}>
+                Implement Solution
+              </div>
+              <div className="feedback-node" style={{ bottom: "0", left: "50%", transform: "translateX(-50%)" }}>
+                Knowledge Expansion
+              </div>
+
+              <div className="loop-arrow" style={{ top: "60px", left: "50%", transformOrigin: "center", width: "100px", transform: "translateX(-50%) rotate(45deg)" }}></div>
+              <div className="loop-arrow" style={{ top: "100px", left: "35%", transformOrigin: "center", width: "100px", transform: "translateY(-50%) rotate(90deg)" }}></div>
+              <div className="loop-arrow" style={{ top: "100px", right: "35%", transformOrigin: "center", width: "100px", transform: "translateY(-50%) rotate(90deg)" }}></div>
+              <div className="loop-arrow" style={{ bottom: "60px", left: "50%", transformOrigin: "center", width: "100px", transform: "translateX(-50%) rotate(45deg)" }}></div>
+            </div>
+
+            <p>
+              The traditional path said: <span className="emphasis">"Learn everything, then build."</span>
+            </p>
+            <p>
+              Meta Learning declared: <span className="emphasis">"Build to learn, learn to build better."</span>
+            </p>
+            <p>
+              Each problem encountered became not a roadblock but a catalyst for growth. Each error message transformed from frustration into illumination.
+            </p>
+          </div>
+        </section>
+
+        {/* Chapter 4 */}
+        <section id="chapter4" className={`chapter ${activeChapter === 3 ? "chapter-active" : ""}`}>
+          <h2 className="chapter-header">The Evolution</h2>
+          <div className="chapter-content">
+            <p>
+              As the journey continued, the evolution became clear. What started as copying and pasting code transformed into understanding command line interfaces, then into crafting bash scripts for automation.
+            </p>
+            <p>
+              The WSL environment became a canvas of possibility. Code became not a foreign language but a medium of expression.
+            </p>
+
+            <div className="visual-container">
+              <div className="journey-path"></div>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div 
+                  key={`node-${index}`} 
+                  className="journey-node" 
+                  style={{ left: `${10 + index * 15}%` }}
+                >
+                  {index + 1}
+                  <div className="node-label">
+                    {[
+                      "Simple HTML",
+                      "JavaScript", 
+                      "VS Code & Debugging",
+                      "WSL Environment",
+                      "Bash Scripting",
+                      "Automated Workflows",
+                    ][index]}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   );

@@ -7,8 +7,8 @@ const HeroSection = lazy(() => import("./sections/HeroSection"));
 const MetaCurtisSection = lazy(() => import("./sections/MetaCurtisSection"));
 const Version3Section = lazy(() => import("./sections/Version3Section"));
 const AboutSection = lazy(() => import("./sections/AboutSection"));
-const TheSystemSection = lazy(() => import("./sections/TheSystemSection"));
 const ContactSection = lazy(() => import("./sections/ContactSection"));
+
 
 
 function App() {
@@ -28,7 +28,6 @@ function App() {
           <HeroSection />
           <MetaCurtisSection />
           <Version3Section />
-          <TheSystemSection />
           <AboutSection />
           <ContactSection />
         </Suspense>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import ParticleSystem from "../components/particles/ParticleSystem";
+import ParticleSystem from "../components/particles/ParticleSystem"; // ✅ Ensure correct path
 
 /**
  * 🎨 WebGL Background with Particle System

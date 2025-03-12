@@ -1,14 +1,15 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useWindowSize } from "react-use";
 
 /**
- * 🌊 Continuous Wave-Like Particle System
+ * 🌊 Continuous Wave-Like Particle System with Chapter Responsiveness
  */
 export default function ParticleSystem() {
   const pointsRef = useRef(null);
   const timeRef = useRef(0);
+  const activeChapterRef = useRef(0);
 
   // **Detect device capabilities**
   const { width } = useWindowSize();
@@ -17,6 +18,27 @@ export default function ParticleSystem() {
 
   // **Adaptive Particle Count**
   const particleCount = useRef(isLowPerformance ? 5000 : isMobile ? 8000 : 15000).current;
+
+  // **Chapter-specific colors**
+  const chapterColors = useMemo(() => [
+    { r: 0.6, g: 0.3, b: 0.9 },  // Chapter 1: Purple
+    { r: 0.2, g: 0.6, b: 0.9 },  // Chapter 2: Blue
+    { r: 0.8, g: 0.2, b: 0.9 },  // Chapter 3: Magenta
+    { r: 0.4, g: 0.3, b: 1.0 },  // Chapter 4: Deep Purple
+    { r: 0.9, g: 0.3, b: 0.8 }   // Chapter 5: Pink
+  ], []);
+
+  // **Listen for chapter changes from Version3Section**
+  useEffect(() => {
+    const handleChapterChange = (event) => {
+      activeChapterRef.current = event.detail.chapterIndex;
+    };
+    
+    window.addEventListener('version3-chapter-change', handleChapterChange);
+    return () => {
+      window.removeEventListener('version3-chapter-change', handleChapterChange);
+    };
+  }, []);
 
   // **Precompute Particle Attributes**
   const { positions, colors, motionFactors } = useMemo(() => {
@@ -61,7 +83,14 @@ export default function ParticleSystem() {
     timeRef.current = currentTime;
 
     const posAttribute = pointsRef.current.geometry.attributes.position;
-    const posArray = posAttribute.array; // ✅ Modify the existing array, do not reassign
+    const posArray = posAttribute.array;
+    
+    // Get color attribute for chapter-based transitions
+    const colorAttribute = pointsRef.current.geometry.attributes.color;
+    const colorArray = colorAttribute.array;
+    
+    // Get target color based on active chapter
+    const targetColor = chapterColors[activeChapterRef.current];
 
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
@@ -85,9 +114,17 @@ export default function ParticleSystem() {
       posArray[i3] += Math.sin(currentTime * 0.5 + i * 0.1) * speed;
       posArray[i3 + 1] += Math.cos(currentTime * 0.3 + i * 0.1) * speed;
       posArray[i3 + 2] += wave * 0.02;
+      
+      // **Gradually transition colors based on chapter**
+      if (targetColor) {
+        colorArray[i3] += (targetColor.r - colorArray[i3]) * 0.01;
+        colorArray[i3 + 1] += (targetColor.g - colorArray[i3 + 1]) * 0.01;
+        colorArray[i3 + 2] += (targetColor.b - colorArray[i3 + 2]) * 0.01;
+      }
     }
 
-    posAttribute.needsUpdate = true; // ✅ Ensure changes apply without resizing
+    posAttribute.needsUpdate = true;
+    colorAttribute.needsUpdate = true; // Make sure color changes are applied
 
     // **Subtle Rotation for Depth**
     pointsRef.current.rotation.y += deltaTime * 0.02;
